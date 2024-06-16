@@ -59,7 +59,7 @@ def main():
                 _, img_encoded = cv2.imencode('.jpg', img_array)
                 img_bytes = img_encoded.tobytes()
 
-                addr = 'https://6152-83-143-66-61.ngrok-free.app'
+                addr = 'https://086a-83-143-66-61.ngrok-free.app'
                 test_url = addr + '/api/test'
                 content_type = 'image/jpeg'
                 headers = {'content-type': content_type}
