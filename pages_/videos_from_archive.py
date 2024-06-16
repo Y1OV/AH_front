@@ -5,8 +5,9 @@ import numpy as np
 import requests
 import json
 import zipfile
-from PIL import Image
+from PIL import Image, UnidentifiedImageError
 import io
+import os
 
 # HTML-код для логотипа
 html_code = '''
@@ -70,27 +71,38 @@ def get_recommendations(unique_classes):
 def process_zip_file(zip_file, class_names, colors):
     results = []
     with zipfile.ZipFile(zip_file, 'r') as archive:
-        for file_name in archive.namelist():
+        for file_info in archive.infolist():
+            file_name = file_info.filename
             if file_name.lower().endswith(('.jpg', '.jpeg', '.png')):
-                with archive.open(file_name) as file:
-                    image = Image.open(file)
-                    img_array = np.array(image)
-                    _, img_encoded = cv2.imencode('.jpg', img_array)
-                    img_bytes = img_encoded.tobytes()
+                try:
+                    # Очистка имени файла
+                    safe_name = os.path.basename(file_name)
+                    safe_name = safe_name.replace("(", "").replace(")", "").replace(" ", "_")
 
-                    addr = 'https://6152-83-143-66-61.ngrok-free.app'
-                    test_url = addr + '/api/test'
-                    content_type = 'image/jpeg'
-                    headers = {'content-type': content_type}
+                    with archive.open(file_info) as file:
+                        image = Image.open(file)
+                        image = image.convert("RGB")  # Конвертация изображения в RGB
+                        img_array = np.array(image)
+                        _, img_encoded = cv2.imencode('.jpg', img_array)
+                        img_bytes = img_encoded.tobytes()
 
-                    response = requests.post(test_url, data=img_bytes, headers=headers)
+                        addr = 'https://6152-83-143-66-61.ngrok-free.app'
+                        test_url = addr + '/api/test'
+                        content_type = 'image/jpeg'
+                        headers = {'content-type': content_type}
 
-                    if response.status_code == 200:
-                        annotations = json.loads(response.text)
-                        annotated_image, unique_classes = visualize_annotations(image, annotations, class_names, colors)
-                        results.append((file_name, annotated_image, unique_classes))
-                    else:
-                        st.error(f"Ошибка при получении аннотаций для файла {file_name}.")
+                        response = requests.post(test_url, data=img_bytes, headers=headers)
+
+                        if response.status_code == 200:
+                            annotations = json.loads(response.text)
+                            annotated_image, unique_classes = visualize_annotations(image, annotations, class_names, colors)
+                            results.append((safe_name, annotated_image, unique_classes))
+                        else:
+                            st.error(f"Ошибка при получении аннотаций для файла {safe_name}.")
+                except UnidentifiedImageError:
+                    st.error(f"Файл {safe_name} не является допустимым изображением.")
+                except Exception as e:
+                    st.error(f"Ошибка при обработке файла {safe_name}: {e}")
     return results
 
 # Основная функция Streamlit приложения
@@ -123,7 +135,6 @@ def main():
             4: (255, 255, 0)
         }
     
-
         if st.button("Распознать дефекты", key="single_button_1"):
 
             if uploaded_zip is not None:
@@ -195,3 +206,4 @@ def main():
                 st.error("Пожалуйста, загрузите ZIP-архив.")
 if __name__ == "__main__":
     main()
+
