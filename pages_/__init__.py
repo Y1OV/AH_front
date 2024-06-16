@@ -1,7 +1,7 @@
 from collections import namedtuple
 
-from lct.videos_from_archive import main as videos_from_archive
-from lct.main import main as main
+from .videos_from_archive import main as videos_from_archive
+from .main import main as main
 
 
 Page = namedtuple("Page", "title method")
