@@ -11,7 +11,8 @@ def main() -> None:
     with st.sidebar.container():
         menu = sac.menu(
             items=list(pages.keys()),
-            index=st.session_state['index'],
+            # index=st.session_state['index'],
+            index=0,
             open_all=True,
             size='middle',
             format_func=lambda page: pages[page].title,
