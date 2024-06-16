@@ -12,7 +12,7 @@ def main() -> None:
         menu = sac.menu(
             items=list(pages.keys()),
             # index=st.session_state['index'],
-            index=0,
+            index=1,
             open_all=True,
             size='middle',
             format_func=lambda page: pages[page].title,
