@@ -18,7 +18,7 @@ def main() -> None:
             format_func=lambda page: pages[page].title,
         )
         st.sidebar.info("Made with ❤ by the ikanam")
-        st.sidebar.info("[TG-бот](https://t.me/ikanam_ai_bot)", unsafe_allow_html=True)
+        st.sidebar.markdown("[TG-бот](https://t.me/ikanam_ai_bot)", unsafe_allow_html=True)
 
     with st.container():
         if menu in pages:
