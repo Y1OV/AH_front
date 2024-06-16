@@ -100,9 +100,9 @@ def process_zip_file(zip_file, class_names, colors):
                         else:
                             st.error(f"Ошибка при получении аннотаций для файла {safe_name}.")
                 except UnidentifiedImageError:
-                    st.error(f"Файл {safe_name} не является допустимым изображением.")
+                    pass
                 except Exception as e:
-                    st.error(f"Ошибка при обработке файла {safe_name}: {e}")
+                    pass
     return results
 
 # Основная функция Streamlit приложения
