@@ -71,7 +71,7 @@ def get_recommendations(unique_classes):
 def process_zip_file(zip_file, class_names, colors):
     results = []
     with zipfile.ZipFile(zip_file, 'r') as archive:
-        for file_info in archive.infolist():
+        for idx, file_info in enumerate(archive.infolist()):
             file_name = file_info.filename
             if file_name.lower().endswith(('.jpg', '.jpeg', '.png')):
                 try:
@@ -96,13 +96,13 @@ def process_zip_file(zip_file, class_names, colors):
                         if response.status_code == 200:
                             annotations = json.loads(response.text)
                             annotated_image, unique_classes = visualize_annotations(image, annotations, class_names, colors)
-                            results.append((safe_name, annotated_image, unique_classes))
+                            results.append((f"{idx}_{safe_name}", annotated_image, unique_classes))
                         else:
                             st.error(f"Ошибка при получении аннотаций для файла {safe_name}.")
-                # except UnidentifiedImageError:
-                #     st.error(f"Файл {safe_name} не является допустимым изображением.")
+                except UnidentifiedImageError:
+                    st.error(f"Файл {safe_name} не является допустимым изображением.")
                 except Exception as e:
-                    st.error(f"Файл обрабатывается")
+                    st.error(f"Ошибка при обработке файла {safe_name}: {e}")
     return results
 
 # Основная функция Streamlit приложения
@@ -154,8 +154,8 @@ def main():
                             )
                             recommendations = get_recommendations(unique_classes)
                             
-                            for cls, rec in recommendations.items():
-                                st.text_area(f"Рекомендации для {cls}", rec, height=100)
+                            for idx, (cls, rec) in enumerate(recommendations.items()):
+                                st.text_area(f"Рекомендации для {cls}", rec, height=100, key=f"rec_{idx}_{cls}")
                         else:
                             st.text(f"Дефекты на изображении {file_name} отсутствуют")
                 else:
@@ -196,14 +196,16 @@ def main():
                             )
                             recommendations = get_recommendations(unique_classes)
                             
-                            for cls, rec in recommendations.items():
-                                st.text_area(f"Рекомендации для {cls}", rec, height=100)
+                            for idx, (cls, rec) in enumerate(recommendations.items()):
+                                st.text_area(f"Рекомендации для {cls}", rec, height=100, key=f"rec_{idx}_{cls}")
                         else:
                             st.text(f"Дефекты на изображении {file_name} отсутствуют")
                 else:
                     st.error("Ошибка при обработке архива.")
             else:
                 st.error("Пожалуйста, загрузите ZIP-архив.")
+                
 if __name__ == "__main__":
     main()
+
 
