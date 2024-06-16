@@ -5,8 +5,8 @@ from pages_ import pages
 
 
 def main() -> None:
-    if 'index' not in st.session_state:
-        st.session_state['index'] = 0
+    # if 'index' not in st.session_state:
+    #     st.session_state['index'] = 0
 
     with st.sidebar.container():
         menu = sac.menu(
