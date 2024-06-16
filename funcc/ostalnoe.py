@@ -9,6 +9,8 @@ from PIL import Image, UnidentifiedImageError
 import io
 import os
 
+from funcc.risovashka import visualize_annotations
+
 def get_recommendations(unique_classes):
     recommendations_dict = {
         'adj': "Используйте правильные параметры сварки. Поддерживайте чистоту сварочной поверхности. Проверьте качество сварочных материалов. Применяйте антипригарные спреи или пасты. Следите за стабильностью дуги и избегайте слишком длинной дуги.",
